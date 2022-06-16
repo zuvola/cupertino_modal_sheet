@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -5,6 +7,8 @@ const double sheetOffset = 10;
 const double displayCornerRadius = 38.5;
 const double sheetCornerRadius = 10;
 const double scaleFactor = 1 / 12;
+const double breakpointWidth = 800;
+const Size maxSize = Size(700, 1000);
 
 class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
   CupertinoModalSheetRoute({
@@ -13,6 +17,8 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
   }) : super(
           pageBuilder: (_, __, ___) => const SizedBox.shrink(),
           opaque: false,
+          barrierColor: Colors.black12,
+          barrierDismissible: true,
         );
 
   final RoutePageBuilder builder;
@@ -20,21 +26,39 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
-    if (!isFirst) {
-      final paddingTop = _paddingTop(context);
-      return Container(
-        decoration:
-            const BoxDecoration(boxShadow: [BoxShadow(color: Colors.black12)]),
-        child: Padding(
-          padding: EdgeInsets.only(top: paddingTop + sheetOffset),
+    final size = MediaQuery.of(context).size;
+    if (size.width > breakpointWidth) {
+      if (isFirst) {
+        return builder(context, animation, secondaryAnimation);
+      }
+      return Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+              maxWidth: maxSize.width,
+              maxHeight: min(size.height * 0.9, maxSize.height)),
           child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(sheetCornerRadius)),
+            borderRadius:
+                const BorderRadius.all(Radius.circular(sheetCornerRadius)),
             child: MediaQuery.removePadding(
               context: context,
               removeTop: true,
               child: builder(context, animation, secondaryAnimation),
             ),
+          ),
+        ),
+      );
+    }
+    if (!isFirst) {
+      final paddingTop = _paddingTop(context);
+      return Padding(
+        padding: EdgeInsets.only(top: paddingTop + sheetOffset),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(sheetCornerRadius)),
+          child: MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: builder(context, animation, secondaryAnimation),
           ),
         ),
       );
@@ -50,6 +74,11 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
+    if (MediaQuery.of(context).size.width > breakpointWidth) {
+      if (isFirst) {
+        return child;
+      }
+    }
     final secValue = secondaryAnimation.value;
     final paddingTop = _paddingTop(context);
     if (isFirst) {
@@ -75,8 +104,8 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
       );
     } else {
       final dist = (paddingTop + sheetOffset) * (1 - scaleFactor);
-      final offset = secValue * (paddingTop - dist);
-      final scale = 1 - secValue / 12;
+      final double offset = secValue * (paddingTop - dist);
+      final scale = 1 - secValue * scaleFactor;
       return _stackTransition(offset, scale, secondaryAnimation, child);
     }
   }
@@ -93,9 +122,7 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
       double offset, double scale, Animation<double> animation, Widget child) {
     return AnimatedBuilder(
       builder: (context, child) => Transform(
-        transform: Matrix4.identity()
-          ..setTranslationRaw(0, offset, 0)
-          ..scale(scale),
+        transform: Matrix4.translationValues(0, offset, 0)..scale(scale),
         alignment: Alignment.topCenter,
         child: child,
       ),
