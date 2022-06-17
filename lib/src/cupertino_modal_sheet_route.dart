@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 const double sheetOffset = 10;
@@ -10,60 +10,73 @@ const double scaleFactor = 1 / 12;
 const double breakpointWidth = 800;
 const Size maxSize = Size(700, 1000);
 
+/// A route that shows a iOS-style modal sheet that slides up from the
+/// bottom of the screen.
+///
+/// It is used internally by [showCupertinoModalSheet] or can be directly
+/// pushed onto the [Navigator] stack to enable state restoration. See
+/// [showCupertinoModalSheet] for a state restoration app example.
 class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
+  /// Creates a page route for use with iOS modal page sheet.
+  ///
+  /// The values of [builder] must not be null.
   CupertinoModalSheetRoute({
     required this.builder,
     super.settings,
+    super.transitionDuration,
+    super.reverseTransitionDuration,
+    super.barrierLabel,
+    super.maintainState = true,
+    super.fullscreenDialog = true,
   }) : super(
           pageBuilder: (_, __, ___) => const SizedBox.shrink(),
           opaque: false,
-          barrierColor: Colors.black12,
+          barrierColor: kCupertinoModalBarrierColor,
           barrierDismissible: true,
         );
 
-  final RoutePageBuilder builder;
+  /// A builder that builds the widget tree for the [CupertinoModalSheetRoute].
+  final WidgetBuilder builder;
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
     final size = MediaQuery.of(context).size;
+    var constrainsts = const BoxConstraints();
+    var borderRadius =
+        const BorderRadius.vertical(top: Radius.circular(sheetCornerRadius));
     if (size.width > breakpointWidth) {
       if (isFirst) {
-        return builder(context, animation, secondaryAnimation);
+        return builder(context);
       }
+      constrainsts = BoxConstraints(
+          maxWidth: maxSize.width,
+          maxHeight: min(size.height * 0.9, maxSize.height));
+      borderRadius = const BorderRadius.all(Radius.circular(sheetCornerRadius));
+    }
+    if (isFirst) {
+      return builder(context);
+    } else {
+      final paddingTop = _paddingTop(context);
       return Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-              maxWidth: maxSize.width,
-              maxHeight: min(size.height * 0.9, maxSize.height)),
-          child: ClipRRect(
-            borderRadius:
-                const BorderRadius.all(Radius.circular(sheetCornerRadius)),
-            child: MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: builder(context, animation, secondaryAnimation),
+        child: Padding(
+          padding: EdgeInsets.only(top: paddingTop + sheetOffset),
+          child: CupertinoUserInterfaceLevel(
+            data: CupertinoUserInterfaceLevelData.elevated,
+            child: ConstrainedBox(
+              constraints: constrainsts,
+              child: ClipRRect(
+                borderRadius: borderRadius,
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: builder(context),
+                ),
+              ),
             ),
           ),
         ),
       );
-    }
-    if (!isFirst) {
-      final paddingTop = _paddingTop(context);
-      return Padding(
-        padding: EdgeInsets.only(top: paddingTop + sheetOffset),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(sheetCornerRadius)),
-          child: MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: builder(context, animation, secondaryAnimation),
-          ),
-        ),
-      );
-    } else {
-      return builder(context, animation, secondaryAnimation);
     }
   }
 
