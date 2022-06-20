@@ -48,7 +48,7 @@ class _BooksAppState extends State<BooksApp> {
                               (context) {
                             _pushDetails(context, book, (context) {
                               _pushDetails(context, book, (context) {
-                                _showDetails(context, book, (context) => null);
+                                _showDetails(context, book, null);
                               });
                             });
                           });
@@ -71,7 +71,7 @@ class _BooksAppState extends State<BooksApp> {
       context: context,
       builder: (context) => BookDetailsScreen(
         book: book,
-        onPressed: () => onPressed?.call(context),
+        onPressed: onPressed == null ? null : () => onPressed(context),
       ),
     );
   }
@@ -89,7 +89,7 @@ class _BooksAppState extends State<BooksApp> {
       BuildContext context, Book book, Function(BuildContext)? onPressed) {
     final nav = Navigator(
       observers: [HeroController()],
-      onGenerateRoute: (settings) => CupertinoModalSheetRoute(
+      onGenerateRoute: (settings) => CupertinoPageRoute(
         builder: ((context) {
           return BookDetailsScreen(
             book: book,
@@ -177,7 +177,7 @@ class BookDetailsScreen extends StatelessWidget {
                     )),
                 Text(book.title, style: Theme.of(context).textTheme.headline6),
                 Text(book.author, style: Theme.of(context).textTheme.subtitle1),
-                ElevatedButton(onPressed: onPressed, child: const Text('next'))
+                ElevatedButton(onPressed: onPressed, child: const Text('next')),
               ],
             ),
           ),

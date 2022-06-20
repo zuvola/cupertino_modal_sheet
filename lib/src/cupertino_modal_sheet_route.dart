@@ -38,11 +38,13 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
   /// A builder that builds the widget tree for the [CupertinoModalSheetRoute].
   final WidgetBuilder builder;
 
+  Curve _curve = Curves.easeInOut;
+
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation) {
     final size = MediaQuery.of(context).size;
-    var constrainsts = const BoxConstraints();
+    final BoxConstraints constrainsts;
     var borderRadius =
         const BorderRadius.vertical(top: Radius.circular(sheetCornerRadius));
     if (size.width > breakpointWidth) {
@@ -53,6 +55,10 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
           maxWidth: maxSize.width,
           maxHeight: min(size.height * 0.9, maxSize.height));
       borderRadius = const BorderRadius.all(Radius.circular(sheetCornerRadius));
+    } else {
+      constrainsts = BoxConstraints(
+        minWidth: size.width,
+      );
     }
     if (isFirst) {
       return builder(context);
@@ -65,12 +71,15 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
             data: CupertinoUserInterfaceLevelData.elevated,
             child: ConstrainedBox(
               constraints: constrainsts,
-              child: ClipRRect(
-                borderRadius: borderRadius,
-                child: MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: builder(context),
+              child: _gestureDetector(
+                size: size,
+                child: ClipRRect(
+                  borderRadius: borderRadius,
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    child: builder(context),
+                  ),
                 ),
               ),
             ),
@@ -110,7 +119,7 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
     }
     if (secondaryAnimation.isDismissed) {
       final tween = Tween(begin: const Offset(0.0, 1.0), end: Offset.zero);
-      final curveTween = CurveTween(curve: Curves.easeInOut);
+      final curveTween = CurveTween(curve: _curve);
       return SlideTransition(
         position: animation.drive(curveTween).drive(tween),
         child: child,
@@ -121,6 +130,52 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
       final scale = 1 - secValue * scaleFactor;
       return _stackTransition(offset, scale, secondaryAnimation, child);
     }
+  }
+
+  Widget _gestureDetector({required Widget child, required Size size}) {
+    final Function(double velocity) dragEnd;
+    dragEnd = (double velocity) {
+      final bool animateForward;
+      if (velocity.abs() >= 1.0) {
+        animateForward = velocity <= 0;
+      } else {
+        animateForward = (controller?.value ?? 0) > 0.5;
+      }
+      if (animateForward) {
+        controller?.animateTo(1.0,
+            duration: transitionDuration, curve: Curves.easeInOut);
+      } else {
+        navigator?.pop();
+      }
+      if (controller?.isAnimating ?? false) {
+        late AnimationStatusListener animationStatusCallback;
+        animationStatusCallback = (AnimationStatus status) {
+          navigator?.didStopUserGesture();
+          controller?.removeStatusListener(animationStatusCallback);
+        };
+        controller?.addStatusListener(animationStatusCallback);
+      } else {
+        if (navigator?.userGestureInProgress ?? false) {
+          navigator?.didStopUserGesture();
+        }
+      }
+    };
+    return GestureDetector(
+      onVerticalDragEnd: (details) {
+        dragEnd(details.velocity.pixelsPerSecond.dy / size.width);
+      },
+      onVerticalDragCancel: () {
+        dragEnd(0);
+      },
+      onVerticalDragStart: (_) {
+        navigator?.didStartUserGesture();
+      },
+      onVerticalDragUpdate: ((details) {
+        _curve = Curves.linear;
+        controller?.value -= details.delta.dy / size.height;
+      }),
+      child: child,
+    );
   }
 
   double _paddingTop(BuildContext context) {
