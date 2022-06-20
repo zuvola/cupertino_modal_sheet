@@ -6,10 +6,10 @@
 **[English](https://github.com/zuvola/cupertino_modal_sheet/blob/master/README.md), [日本語](https://github.com/zuvola/cupertino_modal_sheet/blob/master/README_jp.md)**
 
 
-Shows a modal iOS-style sheet that slides up from the bottom of the screen.  
+画面下部からスライドアップするモーダルなiOS風シートを表示します。  
 
-On mobile devices, the content is displayed as a sheet, with part of the background content near the top of the screen.  
-On tablet, a dimming layer is added to the background content and the content is centered over this layer.  
+モバイルでは、コンテンツをシートとして表示し、画面の上部付近に背景コンテンツの一部が表示されます。  
+タブレット端末では、背景のコンテンツに調光レイヤーを追加し、このレイヤーの上にコンテンツを中央に表示します。
 
 # Mobile
 
@@ -22,12 +22,12 @@ On tablet, a dimming layer is added to the background content and the content is
 
 ## Features
 
-- Hero compatibility
-- Tablet compatibility
-- Swiping to dismiss
-- Multi sheet (Dimming is imperfect)
-- Navigator2 compatibility
-  
+- Heroをサポート
+- Tabletでの表示
+- スワイプでクローズ
+- 複数シート (バリアの表示が不完全)
+- Navigator2対応
+
 
 ## Getting started
 
@@ -40,13 +40,13 @@ showCupertinoModalSheet(
 
 ## Navigator2.0
 
-Use CupertinoModalSheetPage or directly CupertinoModalSheetRoute.
+CupertinoModalSheetPageか直接CupertinoModalSheetRouteを使ってください。
 
 
 ## TODO
 
-- [ ] Tests
-- [ ] Extensibility
-- [ ] Fix dimming of multi-sheet
+- [ ] テスト
+- [ ] 拡張性
+- [ ] 複数シートのバリア修正
 
-PRs are welcome!
+PRは大歓迎です！
