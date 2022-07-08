@@ -22,6 +22,7 @@ Future<T?> showCupertinoModalSheet<T>({
 /// A page that creates a cupertino modal sheet [PageRoute].
 class CupertinoModalSheetPage<T> extends Page<T> {
   final Widget child;
+  final CupertinoModalSheetRouteTransition firstTransition;
 
   const CupertinoModalSheetPage({
     super.key,
@@ -29,6 +30,7 @@ class CupertinoModalSheetPage<T> extends Page<T> {
     super.name,
     super.arguments,
     super.restorationId,
+    this.firstTransition = CupertinoModalSheetRouteTransition.none,
   });
 
   @override
@@ -36,6 +38,7 @@ class CupertinoModalSheetPage<T> extends Page<T> {
     return CupertinoModalSheetRoute<T>(
       builder: (_) => child,
       settings: this,
+      firstTransition: firstTransition,
     );
   }
 }

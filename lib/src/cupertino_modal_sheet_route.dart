@@ -10,6 +10,12 @@ const double scaleFactor = 1 / 12;
 const double breakpointWidth = 800;
 const Size maxSize = Size(700, 1000);
 
+enum CupertinoModalSheetRouteTransition {
+  none,
+  scale,
+  fade,
+}
+
 /// A route that shows a iOS-style modal sheet that slides up from the
 /// bottom of the screen.
 ///
@@ -28,6 +34,7 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
     super.barrierLabel,
     super.maintainState = true,
     super.fullscreenDialog = true,
+    this.firstTransition = CupertinoModalSheetRouteTransition.none,
   }) : super(
           pageBuilder: (_, __, ___) => const SizedBox.shrink(),
           opaque: false,
@@ -37,6 +44,9 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
 
   /// A builder that builds the widget tree for the [CupertinoModalSheetRoute].
   final WidgetBuilder builder;
+
+  /// A transition for initial page push animation.
+  final CupertinoModalSheetRouteTransition firstTransition;
 
   Curve _curve = Curves.easeInOut;
 
@@ -112,9 +122,23 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
         borderRadius: BorderRadius.circular(radius),
         child: child,
       );
+      var transitionChild =
+          _stackTransition(offset, scale, secondaryAnimation, clipChild);
+      if (firstTransition == CupertinoModalSheetRouteTransition.fade) {
+        transitionChild = FadeTransition(
+          opacity: animation,
+          child: transitionChild,
+        );
+      }
+      if (firstTransition == CupertinoModalSheetRouteTransition.scale) {
+        transitionChild = ScaleTransition(
+          scale: animation,
+          child: transitionChild,
+        );
+      }
       return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
-        child: _stackTransition(offset, scale, secondaryAnimation, clipChild),
+        child: transitionChild,
       );
     }
     if (secondaryAnimation.isDismissed) {
