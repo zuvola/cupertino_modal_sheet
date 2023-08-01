@@ -28,7 +28,7 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
   /// The values of [builder] must not be null.
   CupertinoModalSheetRoute({
     required this.builder,
-    required this.barrierDismissible,
+    this.barrierDismissible = true,
     super.settings,
     super.transitionDuration,
     super.reverseTransitionDuration,
