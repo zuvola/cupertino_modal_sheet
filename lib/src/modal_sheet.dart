@@ -10,6 +10,7 @@ Future<T?> showCupertinoModalSheet<T>({
   RouteSettings? routeSettings,
   bool fullscreenDialog = true,
   bool barrierDismissible = true,
+  CupertinoModalSheetRouteTransition firstTransition = CupertinoModalSheetRouteTransition.none
 }) {
   return Navigator.of(context, rootNavigator: useRootNavigator).push(
     CupertinoModalSheetRoute<T>(
@@ -17,6 +18,7 @@ Future<T?> showCupertinoModalSheet<T>({
       settings: routeSettings,
       fullscreenDialog: fullscreenDialog,
       barrierDismissible: barrierDismissible,
+      firstTransition: firstTransition,
     ),
   );
 }
