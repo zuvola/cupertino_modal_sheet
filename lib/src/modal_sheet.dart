@@ -9,12 +9,14 @@ Future<T?> showCupertinoModalSheet<T>({
   bool useRootNavigator = true,
   RouteSettings? routeSettings,
   bool fullscreenDialog = true,
+  bool barrierDismissible = true,
 }) {
   return Navigator.of(context, rootNavigator: useRootNavigator).push(
     CupertinoModalSheetRoute<T>(
       builder: builder,
       settings: routeSettings,
       fullscreenDialog: fullscreenDialog,
+      barrierDismissible: barrierDismissible,
     ),
   );
 }
