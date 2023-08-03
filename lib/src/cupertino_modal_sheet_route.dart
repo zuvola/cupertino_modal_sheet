@@ -83,30 +83,29 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
           child: CupertinoUserInterfaceLevel(
             data: CupertinoUserInterfaceLevelData.elevated,
             child: ConstrainedBox(
-              constraints: constrainsts,
-              child: Visibility(
-                visible: barrierDismissible,
-                replacement: ClipRRect(
-                  borderRadius: borderRadius,
-                  child: MediaQuery.removePadding(
-                    context: context,
-                    removeTop: true,
-                    child: builder(context),
+                constraints: constrainsts,
+                child: Visibility(
+                  visible: barrierDismissible,
+                  replacement: ClipRRect(
+                    borderRadius: borderRadius,
+                    child: MediaQuery.removePadding(
+                      context: context,
+                      removeTop: true,
+                      child: builder(context),
+                    ),
                   ),
-                ),
-                child: _gestureDetector(
-                size: size,
-                child: ClipRRect(
-                  borderRadius: borderRadius,
-                  child: MediaQuery.removePadding(
-                    context: context,
-                    removeTop: true,
-                    child: builder(context),
+                  child: _gestureDetector(
+                    size: size,
+                    child: ClipRRect(
+                      borderRadius: borderRadius,
+                      child: MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        child: builder(context),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-               )
-            ),
+                )),
           ),
         ),
       );
