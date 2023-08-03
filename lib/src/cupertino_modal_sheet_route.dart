@@ -28,7 +28,7 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
   /// The values of [builder] must not be null.
   CupertinoModalSheetRoute({
     required this.builder,
-    this.barrierDismissible = true,
+    super.barrierDismissible = true,
     super.settings,
     super.transitionDuration,
     super.reverseTransitionDuration,
@@ -40,13 +40,10 @@ class CupertinoModalSheetRoute<T> extends PageRouteBuilder<T> {
           pageBuilder: (_, __, ___) => const SizedBox.shrink(),
           opaque: false,
           barrierColor: kCupertinoModalBarrierColor,
-          barrierDismissible: barrierDismissible,
         );
 
   /// A builder that builds the widget tree for the [CupertinoModalSheetRoute].
   final WidgetBuilder builder;
-
-  final bool barrierDismissible;
 
   /// A transition for initial page push animation.
   final CupertinoModalSheetRouteTransition firstTransition;
