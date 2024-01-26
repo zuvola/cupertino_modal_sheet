@@ -10,8 +10,7 @@ Future<T?> showCupertinoModalSheet<T>(
     RouteSettings? routeSettings,
     bool fullscreenDialog = true,
     bool barrierDismissible = true,
-    CupertinoModalSheetRouteTransition firstTransition =
-        CupertinoModalSheetRouteTransition.none}) {
+    CupertinoModalSheetRouteTransition firstTransition = CupertinoModalSheetRouteTransition.none}) {
   return Navigator.of(context, rootNavigator: useRootNavigator).push(
     CupertinoModalSheetRoute<T>(
       builder: builder,
@@ -39,10 +38,19 @@ class CupertinoModalSheetPage<T> extends Page<T> {
 
   @override
   Route<T> createRoute(BuildContext context) {
-    return CupertinoModalSheetRoute<T>(
-      builder: (_) => child,
-      settings: this,
+    return _PagedCupertinoModalSheetRoute<T>(
+      this,
       firstTransition: firstTransition,
     );
   }
+}
+
+class _PagedCupertinoModalSheetRoute<T> extends CupertinoModalSheetRoute<T> {
+  _PagedCupertinoModalSheetRoute(
+    CupertinoModalSheetPage<T> page, {
+    super.firstTransition = CupertinoModalSheetRouteTransition.none,
+  }) : super(settings: page, builder: (_) => const SizedBox());
+
+  @override
+  WidgetBuilder get builder => (context) => (settings as CupertinoModalSheetPage<T>).child;
 }
